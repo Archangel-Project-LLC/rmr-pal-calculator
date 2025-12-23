@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RMR & PAL Calculator</title>
+</head>
+<body>
+  <h1>RMR & PAL Calculator</h1>
+
+  <label>Sex:
+    <select id="sex">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </label><br>
+
+  <label>Age (years): <input id="age" type="number"></label><br>
+  <label>Weight (kg): <input id="weight" type="number"></label><br>
+  <label>Height (cm): <input id="height" type="number"></label><br>
+  <label>Average steps/day: <input id="steps" type="number"></label><br>
+
+  <label>Training sessions per week: <input id="sessions" type="number"></label><br>
+  <label>Average duration per session (minutes): <input id="duration" type="number"></label><br>
+  <label>Intensity:
+    <select id="intensity">
+      <option value="light">Light</option>
+      <option value="moderate">Moderate</option>
+      <option value="hard">Hard</option>
+    </select>
+  </label><br><br>
+
+  <button onclick="calculate()">Calculate</button>
+
+  <h2>Results</h2>
+  <p id="results"></p>
+
+  <script src="script.js"></script>
+</body>
+</html>
