@@ -2,36 +2,87 @@
 <html>
 <head>
   <title>RMR & PAL Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>RMR & PAL Calculator</h1>
+  <div class="container">
+    <h1>RMR & PAL Calculator</h1>
+    <p class="description">
+      Estimate resting metabolic rate (Mifflin–St&nbsp;Jeor), steps-based PAL, training calories, goal targets and daily macros.
+    </p>
 
-  <label>Sex:
-    <select id="sex">
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-  </label><br>
+    <div class="form-row">
+      <label for="sex">Sex</label>
+      <select id="sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
 
-  <label>Age (years): <input id="age" type="number"></label><br>
-  <label>Weight (kg): <input id="weight" type="number"></label><br>
-  <label>Height (cm): <input id="height" type="number"></label><br>
-  <label>Average steps/day: <input id="steps" type="number"></label><br>
+    <div class="form-row">
+      <label for="age">Age (years)</label>
+      <input id="age" type="number">
+    </div>
 
-  <label>Training sessions per week: <input id="sessions" type="number"></label><br>
-  <label>Average duration per session (minutes): <input id="duration" type="number"></label><br>
-  <label>Intensity:
-    <select id="intensity">
-      <option value="light">Light</option>
-      <option value="moderate">Moderate</option>
-      <option value="hard">Hard</option>
-    </select>
-  </label><br><br>
+    <div class="form-row">
+      <label for="weight">Weight (kg)</label>
+      <input id="weight" type="number">
+    </div>
 
-  <button onclick="calculate()">Calculate</button>
+    <div class="form-row">
+      <label for="height">Height (cm)</label>
+      <input id="height" type="number">
+    </div>
 
-  <h2>Results</h2>
-  <p id="results"></p>
+    <div class="form-row">
+      <label for="steps">Average steps/day</label>
+      <input id="steps" type="number">
+    </div>
+
+    <div class="form-row">
+      <label for="sessions">Training sessions per week</label>
+      <input id="sessions" type="number">
+    </div>
+
+    <div class="form-row">
+      <label for="duration">Average duration per session (minutes)</label>
+      <input id="duration" type="number">
+    </div>
+
+    <div class="form-row">
+      <label for="intensity">Intensity</label>
+      <select id="intensity">
+        <option value="light">Light</option>
+        <option value="moderate">Moderate</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
+    <hr style="margin: 18px 0; border: none; border-top: 1px solid #1f2937;">
+
+    <div class="form-row">
+      <label for="goal">Goal</label>
+      <select id="goal">
+        <option value="loss">Fat loss</option>
+        <option value="maintain">Maintenance</option>
+        <option value="gain">Muscle gain</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label for="rate">Target rate (% bodyweight per week)</label>
+      <input id="rate" type="number" step="0.1" placeholder="e.g. 0.5">
+    </div>
+
+    <div class="button-row">
+      <button onclick="calculate()">Calculate</button>
+    </div>
+
+    <div class="results-box">
+      <div class="results-title">Results</div>
+      <p id="results"></p>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
