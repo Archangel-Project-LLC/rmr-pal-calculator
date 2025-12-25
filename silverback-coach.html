@@ -157,14 +157,14 @@
 
     .adjust-row {
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       gap: 10px;
       margin-top: 12px;
       flex-wrap: wrap;
     }
 
     .adjust-input {
-      max-width: 160px;
+      max-width: 260px;
     }
 
     .adjust-control {
@@ -194,6 +194,27 @@
     .adjust-control input {
       width: 80px;
       text-align: center;
+    }
+
+    .adjust-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .adjust-chip {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .adjust-chip:hover {
+      background: #111827;
     }
 
     .macro-bar {
@@ -335,6 +356,20 @@
             <input id="kcalAdj" type="number" value="0">
             <button class="adjust-btn" onclick="changeAdj(100)">+</button>
           </div>
+          <div class="adjust-chips">
+            <span class="adjust-chip" onclick="setAdj(-300)">−300</span>
+            <span class="adjust-chip" onclick="setAdj(-250)">−250</span>
+            <span class="adjust-chip" onclick="setAdj(-200)">−200</span>
+            <span class="adjust-chip" onclick="setAdj(-150)">−150</span>
+            <span class="adjust-chip" onclick="setAdj(-100)">−100</span>
+            <span class="adjust-chip" onclick="setAdj(-50)">−50</span>
+            <span class="adjust-chip" onclick="setAdj(50)">+50</span>
+            <span class="adjust-chip" onclick="setAdj(100)">+100</span>
+            <span class="adjust-chip" onclick="setAdj(150)">+150</span>
+            <span class="adjust-chip" onclick="setAdj(200)">+200</span>
+            <span class="adjust-chip" onclick="setAdj(250)">+250</span>
+            <span class="adjust-chip" onclick="setAdj(300)">+300</span>
+          </div>
         </div>
         <div>
           <div style="font-size:11px; color:#9ca3af;">Negative = loss, positive = gain</div>
@@ -408,6 +443,25 @@
       <div class="note">
         Lines show % of kcal, grams/day and g/kg (based on current bodyweight).
       </div>
+
+      <!-- Nutrient timing panel -->
+      <div style="margin-top:18px; font-size:12px; font-weight:600;">Nutrient timing (coach)</div>
+
+      <div class="panel" style="margin-top:8px; padding:10px 12px; background:#020617; border-radius:12px; border:1px solid #1f2937;">
+        <div style="font-size:11px; color:#9ca3af; margin-bottom:6px;">
+          Based on current daily protein and carbs and bodyweight.
+        </div>
+
+        <div style="font-size:11px; margin-bottom:4px; font-weight:600;">Protein</div>
+        <div style="font-size:11px; color:#e5e7eb;" id="ntProteinAny">Any meal: –</div>
+        <div style="font-size:11px; color:#e5e7eb; margin-bottom:6px;" id="ntProteinPost">Post‑training: –</div>
+
+        <div style="font-size:11px; margin-bottom:4px; font-weight:600;">Carbs</div>
+        <div style="font-size:11px; color:#e5e7eb;" id="ntCarbPre3h">3–4 h pre‑training: –</div>
+        <div style="font-size:11px; color:#e5e7eb;" id="ntCarbPre60">60–90 min pre‑training: –</div>
+        <div style="font-size:11px; color:#e5e7eb;" id="ntCarbIntra">Intra‑training: –</div>
+        <div style="font-size:11px; color:#e5e7eb;" id="ntCarbPost">Post‑training: –</div>
+      </div>
     </div>
   </div>
 
@@ -430,6 +484,12 @@
       const input = document.getElementById('kcalAdj');
       const current = Number(input.value || 0);
       input.value = current + delta;
+      recalc();
+    }
+
+    function setAdj(value) {
+      const input = document.getElementById('kcalAdj');
+      input.value = value;
       recalc();
     }
 
@@ -480,6 +540,7 @@
 
       updateMacroBar();
       updateMacroLines(target, weight);
+      updateNutrientTiming(target, weight);
     }
 
     function updateMacroBar() {
@@ -522,6 +583,73 @@
       document.getElementById('fatLine').innerText =
         fatPct.toFixed(0) + '% · ' + Math.round(fatG) + ' g (' +
         (fatG / w).toFixed(2) + ' g/kg)';
+    }
+
+    function updateNutrientTiming(targetKcal, weight) {
+      const totalKcal = Math.max(targetKcal, 1);
+      const w = Math.max(weight, 1);
+
+      const carbKcal = totalKcal * (carbPct / 100);
+      const carbG   = carbKcal / 4;
+
+      const protKcal = totalKcal * (protPct / 100);
+      const protG    = protKcal / 4;
+      const protGkg  = protG / w;
+
+      // Protein ranges
+      const anyMin = 0.4 * w;
+      const anyMax = 0.55 * w;
+      const postMin = 0.6 * w;
+      const postMax = 0.8 * w;
+
+      document.getElementById('ntProteinAny').innerText =
+        'Any meal: ' + Math.round(anyMin) + '–' + Math.round(anyMax) +
+        ' g (0.40–0.55 g/kg; daily avg ' + protGkg.toFixed(2) + ' g/kg)';
+
+      document.getElementById('ntProteinPost').innerText =
+        'Post‑training: ' + Math.round(postMin) + '–' + Math.round(postMax) +
+        ' g (0.60–0.80 g/kg)';
+
+      // Carbs helpers
+      function rangeTextFromGkg(valuesGkg, fixedPct) {
+        const grams = valuesGkg.map(x => x * w);
+        const minG = Math.min(...grams);
+        const maxG = Math.max(...grams);
+        const parts = valuesGkg.map(v => v.toFixed(2) + ' g/kg');
+        const pctPart = fixedPct != null ? ', ' + fixedPct + '% of daily carbs' : '';
+        return Math.round(minG) + '–' + Math.round(maxG) + ' g (' +
+               parts.join(', ') + pctPart + ')';
+      }
+
+      // 3–4 h pre: 15% carbs, 0.8, 1.0 g/kg
+      const pre3Pct = 0.15;
+      const pre3FromPctG = carbG * pre3Pct;
+      const pre3GkgOptions = [0.8, 1.0, pre3FromPctG / w];
+      document.getElementById('ntCarbPre3h').innerText =
+        '3–4 h pre‑training: ' + rangeTextFromGkg(pre3GkgOptions, 15);
+
+      // 60–90 min pre: 0.5, 0.8, 1.0 g/kg and 15% carbs
+      const pre60Pct = 0.15;
+      const pre60FromPctG = carbG * pre60Pct;
+      const pre60GkgOptions = [0.5, 0.8, 1.0, pre60FromPctG / w];
+      document.getElementById('ntCarbPre60').innerText =
+        '60–90 min pre‑training: ' + rangeTextFromGkg(pre60GkgOptions, 15);
+
+      // Intra: 0.5 g/kg, 60 g/h
+      const intraGkg = 0.5;
+      const intraFromGkg = intraGkg * w;
+      const intraMin = Math.min(intraFromGkg, 60);
+      const intraMax = Math.max(intraFromGkg, 60);
+      document.getElementById('ntCarbIntra').innerText =
+        'Intra‑training: ' + Math.round(intraMin) + '–' + Math.round(intraMax) +
+        ' g (0.50 g/kg and ~60 g per hour)';
+
+      // Post: 0.6, 0.8, 1.2, 1.5 g/kg, or 30% carbs
+      const postPct = 0.30;
+      const postFromPctG = carbG * postPct;
+      const postGkgOptions = [0.6, 0.8, 1.2, 1.5, postFromPctG / w];
+      document.getElementById('ntCarbPost').innerText =
+        'Post‑training: ' + rangeTextFromGkg(postGkgOptions, 30);
     }
 
     function initHandles() {
