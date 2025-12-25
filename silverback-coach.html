@@ -16,7 +16,7 @@
       max-width: 1100px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 0.9fr 1.1fr; /* wider right column */
+      grid-template-columns: 0.9fr 1.1fr;
       gap: 24px;
     }
 
@@ -270,7 +270,6 @@
       margin-top: 6px;
     }
 
-    /* Timing panel table style */
     .timing-table {
       width: 100%;
       border-collapse: collapse;
@@ -308,6 +307,14 @@
     }
 
     /* NEW: planner tables */
+    .planner-wrapper {
+      max-width: 1100px;
+      margin: 18px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
     .planner-table {
       width: 100%;
       border-collapse: collapse;
@@ -340,7 +347,7 @@
 
     .planner-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px 14px;
       margin-bottom: 10px;
     }
@@ -349,6 +356,17 @@
       .layout {
         grid-template-columns: 1fr;
       }
+      .planner-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .footer {
+      max-width: 1100px;
+      margin: 18px auto 0;
+      font-size: 10px;
+      color: #6b7280;
+      text-align: center;
     }
   </style>
 </head>
@@ -435,9 +453,8 @@
       </div>
     </div>
 
-    <!-- RIGHT: TARGETS + TIMING + NEW PLANNER -->
+    <!-- RIGHT: TARGET + PERI -->
     <div class="right-col">
-      <!-- Silverback target panel -->
       <div class="panel">
         <div class="panel-header">Silverback target</div>
         <div class="subtle">Target energy and macro breakdown for current setup.</div>
@@ -488,7 +505,6 @@
         </div>
       </div>
 
-      <!-- Nutrient timing panel -->
       <div class="panel">
         <div class="panel-header">Peri‑workout nutrient timing</div>
         <div class="subtle">Coach-facing guide based on current protein, carbs and bodyweight.</div>
@@ -528,94 +544,104 @@
           Ranges combine fixed g/kg targets with % of daily carbs for any meal, post‑training and carb phases.[web:73]
         </div>
       </div>
-
-      <!-- NEW: Training day timing panel -->
-      <div class="panel">
-        <div class="panel-header">Training day meal timing</div>
-        <div class="subtle">
-          First feeding within 1 h of waking, last 2–3 h before bed, mostly 3–5 h gaps, at least 4 protein feedings.[web:90][web:110]
-        </div>
-
-        <div class="planner-grid">
-          <div class="form-row">
-            <label for="tdWake">Wake time</label>
-            <input id="tdWake" type="time" value="07:00">
-          </div>
-          <div class="form-row">
-            <label for="tdBed">Bed time</label>
-            <input id="tdBed" type="time" value="23:00">
-          </div>
-          <div class="form-row">
-            <label for="tdTrain">Training start</label>
-            <input id="tdTrain" type="time" value="18:00">
-          </div>
-          <div class="form-row">
-            <label for="tdMeals">Meals per day</label>
-            <select id="tdMeals">
-              <option value="4" selected>4</option>
-              <option value="5">5</option>
-            </select>
-          </div>
-        </div>
-
-        <table class="planner-table">
-          <thead>
-            <tr>
-              <th>Meal</th>
-              <th>Time</th>
-              <th>Tag</th>
-              <th>Protein (g)</th>
-              <th>Carbs (g)</th>
-              <th>Fat (g)</th>
-            </tr>
-          </thead>
-          <tbody id="tdMealBody">
-            <!-- JS fills -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- NEW: Rest day timing panel -->
-      <div class="panel">
-        <div class="panel-header">Rest day meal timing</div>
-        <div class="subtle">
-          Same wake/bed and spacing rules, no pre/intra/post tags. Coaches can mirror training‑day macros or use lower‑kcal rest‑day targets.[web:111]
-        </div>
-
-        <div class="planner-grid">
-          <div class="form-row">
-            <label for="rdWake">Wake time</label>
-            <input id="rdWake" type="time" value="07:00">
-          </div>
-          <div class="form-row">
-            <label for="rdBed">Bed time</label>
-            <input id="rdBed" type="time" value="23:00">
-          </div>
-          <div class="form-row">
-            <label for="rdMeals">Meals per day</label>
-            <select id="rdMeals">
-              <option value="4" selected>4</option>
-              <option value="5">5</option>
-            </select>
-          </div>
-        </div>
-
-        <table class="planner-table">
-          <thead>
-            <tr>
-              <th>Meal</th>
-              <th>Time</th>
-              <th>Protein (g)</th>
-              <th>Carbs (g)</th>
-              <th>Fat (g)</th>
-            </tr>
-          </thead>
-          <tbody id="rdMealBody">
-            <!-- JS fills -->
-          </tbody>
-        </table>
-      </div>
     </div>
+  </div>
+
+  <!-- NEW: full‑width planner panels -->
+  <div class="planner-wrapper">
+    <!-- Training day -->
+    <div class="panel">
+      <div class="panel-header">Training day meal timing</div>
+      <div class="subtle">
+        First feeding within 1 h of waking, last 2–3 h before bed, mostly 3–5 h gaps, ≥4 protein feedings. Intra carbs sit at training time.[web:192][web:196]
+      </div>
+
+      <div class="planner-grid">
+        <div class="form-row">
+          <label for="tdWake">Wake time</label>
+          <input id="tdWake" type="time" value="07:00">
+        </div>
+        <div class="form-row">
+          <label for="tdBed">Bed time</label>
+          <input id="tdBed" type="time" value="23:00">
+        </div>
+        <div class="form-row">
+          <label for="tdTrain">Training start</label>
+          <input id="tdTrain" type="time" value="18:00">
+        </div>
+        <div class="form-row">
+          <label for="tdMeals">Meals per day</label>
+          <select id="tdMeals">
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+
+      <table class="planner-table">
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Time</th>
+            <th>Tag</th>
+            <th>Protein (g)</th>
+            <th>Carbs (g)</th>
+            <th>Fat (g)</th>
+          </tr>
+        </thead>
+        <tbody id="tdMealBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" class="timing-small">
+              Intra training: typically 0 g protein, ~0.5 g/kg carbs and/or ~30–60 g per training hour, aligned with your peri‑workout card.[web:193][web:202]
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Rest day -->
+    <div class="panel">
+      <div class="panel-header">Rest day meal timing</div>
+      <div class="subtle">
+        Same wake/bed and spacing rules, no pre/intra/post tags. Coaches can mirror training‑day macros or use lower‑kcal rest‑day targets.[web:196]
+      </div>
+
+      <div class="planner-grid">
+        <div class="form-row">
+          <label for="rdWake">Wake time</label>
+          <input id="rdWake" type="time" value="07:00">
+        </div>
+        <div class="form-row">
+          <label for="rdBed">Bed time</label>
+          <input id="rdBed" type="time" value="23:00">
+        </div>
+        <div class="form-row">
+          <label for="rdMeals">Meals per day</label>
+          <select id="rdMeals">
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+
+      <table class="planner-table">
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Time</th>
+            <th>Protein (g)</th>
+            <th>Carbs (g)</th>
+            <th>Fat (g)</th>
+          </tr>
+        </thead>
+        <tbody id="rdMealBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Licensed to Silverback Performance Coaching LLC by Archangel Project LLC.
   </div>
 
   <script>
@@ -630,7 +656,7 @@
     function kcalPerHourForIntensity(intensity) {
       if (intensity === 'light') return 250;
       if (intensity === 'moderate') return 400;
-      return 550; // hard
+      return 550;
     }
 
     function changeAdj(delta) {
@@ -665,7 +691,7 @@
 
       const tdee = base + trainingKcalPerDay;
       const target = tdee + kcalAdj;
-      const weeklyKg = kcalAdj * 0.0009; // 100 kcal/day ≈ 0.09 kg/week[web:90]
+      const weeklyKg = kcalAdj * 0.0009;
 
       document.getElementById('targetKcal').innerText = Math.round(target);
       document.getElementById('pillRmr').innerText = 'RMR ' + Math.round(rmr);
@@ -698,7 +724,7 @@
       document.getElementById('segProtein').style.width = protW + 'px';
       document.getElementById('segFat').style.width = fatW + 'px';
 
-      document.getElementById('handleLeft').style.left = (carbW) + 'px';
+      document.getElementById('handleLeft').style.left = carbW + 'px';
       document.getElementById('handleRight').style.left = (carbW + protW) + 'px';
     }
 
@@ -738,7 +764,6 @@
       const protKcal = totalKcal * (protPct / 100);
       const protG    = protKcal / 4;
 
-      // Protein
       const anyMin = 0.4 * w;
       const anyMax = 0.55 * w;
       const postMin = 0.6 * w;
@@ -796,8 +821,7 @@
         post.detail + '</span>';
     }
 
-    /* --------- Meal‑timing helpers --------- */
-
+    // ---------- Planner helpers ----------
     function parseTimeToMinutes(t) {
       const [h, m] = t.split(':').map(Number);
       return h * 60 + m;
@@ -815,8 +839,8 @@
       const bed = parseTimeToMinutes(bedStr);
       let awakeSpan = bed - wake;
       if (awakeSpan <= 0) awakeSpan += 1440;
-      const firstMeal = wake + 30;  // within ~1 h of waking
-      const lastMeal = bed - 150;   // ~2.5 h before bed
+      const firstMeal = wake + 30;
+      const lastMeal = bed - 150;
       if (lastMeal <= firstMeal) {
         const gap = awakeSpan / (meals - 1);
         const times = [];
@@ -830,7 +854,7 @@
       return times;
     }
 
-    function macroPerMeal(targetKcal, weight, meals) {
+    function macroPerMeal(targetKcal, meals) {
       const totalKcal = Math.max(targetKcal, 1);
       const carbKcal = totalKcal * (carbPct / 100);
       const protKcal = totalKcal * (protPct / 100);
@@ -852,7 +876,7 @@
       for (let i = 0; i < mealTimes.length; i++) {
         if (mealTimes[i] < trainMin) preIdx = i;
       }
-      if (preIdx === -1) preIdx = 0; // early training -> breakfast is pre
+      if (preIdx === -1) preIdx = 0;
       let postIdx = -1;
       for (let i = 0; i < mealTimes.length; i++) {
         if (mealTimes[i] > trainMin) { postIdx = i; break; }
@@ -871,7 +895,7 @@
 
       const times = buildMealTimes(wakeStr, bedStr, meals);
       const tags  = tagTrainingMeals(times, trainStr);
-      const macros = macroPerMeal(targetKcal, weight, meals);
+      const macros = macroPerMeal(targetKcal, meals);
 
       const tbody = document.getElementById('tdMealBody');
       tbody.innerHTML = '';
@@ -896,7 +920,7 @@
       const meals   = parseInt(document.getElementById('rdMeals').value || '4', 10);
 
       const times = buildMealTimes(wakeStr, bedStr, meals);
-      const macros = macroPerMeal(targetKcal, weight, meals);
+      const macros = macroPerMeal(targetKcal, meals);
 
       const tbody = document.getElementById('rdMealBody');
       tbody.innerHTML = '';
@@ -976,9 +1000,11 @@
       window.addEventListener('mouseup', onMouseUp);
     }
 
-    function wirePlannerInputs() {
-      const ids = ['tdWake','tdBed','tdTrain','tdMeals','rdWake','rdBed','rdMeals',
-                   'sex','age','weight','height','pal','sessions','duration','intensity','kcalAdj'];
+    function wireInputs() {
+      const ids = [
+        'sex','age','weight','height','pal','sessions','duration','intensity','kcalAdj',
+        'tdWake','tdBed','tdTrain','tdMeals','rdWake','rdBed','rdMeals'
+      ];
       ids.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -989,7 +1015,7 @@
 
     window.addEventListener('load', () => {
       initHandles();
-      wirePlannerInputs();
+      wireInputs();
       recalc();
     });
   </script>
