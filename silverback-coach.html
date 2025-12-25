@@ -57,16 +57,20 @@
       color: #cbd5f5;
     }
 
-    input, select {
+    input,
+    select {
       padding: 7px 9px;
       border-radius: 8px;
       border: 1px solid #4b5563;
       background: #020617;
       color: #e5e7eb;
       font-size: 13px;
+      height: 34px;
+      box-sizing: border-box;
     }
 
-    input:focus, select:focus {
+    input:focus,
+    select:focus {
       outline: none;
       border-color: #38bdf8;
       box-shadow: 0 0 0 1px #38bdf8;
@@ -85,6 +89,8 @@
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
+      height: 34px;
+      box-sizing: border-box;
     }
 
     button:hover {
@@ -177,6 +183,8 @@
       font-size: 13px;
       width: 30px;
       text-align: center;
+      height: 34px;
+      box-sizing: border-box;
     }
 
     .adjust-btn:hover {
@@ -269,7 +277,7 @@
 
       <div class="form-grid">
         <div class="form-row">
-          <label for="sex">Sex</label>
+          <label for="sex">Gender</label>
           <select id="sex">
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -450,7 +458,7 @@
 
       const tdee = base + trainingKcalPerDay;
       const target = tdee + kcalAdj;
-      const weeklyKg = kcalAdj * 0.0009; // 100 kcal/day ≈ 0.09 kg/week
+      const weeklyKg = kcalAdj * 0.0009; // 100 kcal/day ≈ 0.09 kg/week[web:17]
 
       document.getElementById('chipRmr').innerText = 'RMR: ' + Math.round(rmr) + ' kcal';
       document.getElementById('chipPal').innerText = 'PAL: ' + pal.toFixed(2);
