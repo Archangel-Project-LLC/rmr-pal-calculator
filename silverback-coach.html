@@ -151,14 +151,41 @@
 
     .adjust-row {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: 10px;
       margin-top: 12px;
       flex-wrap: wrap;
     }
 
     .adjust-input {
-      max-width: 110px;
+      max-width: 160px;
+    }
+
+    .adjust-control {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .adjust-btn {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      cursor: pointer;
+      font-size: 13px;
+      width: 30px;
+      text-align: center;
+    }
+
+    .adjust-btn:hover {
+      background: #111827;
+    }
+
+    .adjust-control input {
+      width: 80px;
+      text-align: center;
     }
 
     .macro-bar {
@@ -260,26 +287,46 @@
           <label for="height">Height (cm)</label>
           <input id="height" type="number" value="180">
         </div>
+
         <div class="form-row">
           <label for="pal">PAL (activity factor)</label>
           <select id="pal">
-            <option value="1.2">1.2 · Sedentary</option>
-            <option value="1.35">1.35 · Low active</option>
-            <option value="1.5" selected>1.5 · Moderate</option>
-            <option value="1.7">1.7 · Very active</option>
-            <option value="1.9">1.9 · Extra active</option>
+            <option value="1.2">1.2 · Sedentary · &lt;5k steps/day</option>
+            <option value="1.35">1.35 · Low active · 5–7.9k steps/day</option>
+            <option value="1.5" selected>1.5 · Moderate · 8–9.9k steps/day</option>
+            <option value="1.7">1.7 · Very active · 10–14.9k steps/day</option>
+            <option value="1.9">1.9 · Ultra active · ≥15k steps/day</option>
           </select>
         </div>
+
         <div class="form-row">
-          <label for="trainingKcal">Training kcal/day (average)</label>
-          <input id="trainingKcal" type="number" value="0">
+          <label for="sessions">Training sessions per week</label>
+          <input id="sessions" type="number" value="0">
+        </div>
+
+        <div class="form-row">
+          <label for="duration">Average session duration (min)</label>
+          <input id="duration" type="number" value="60">
+        </div>
+
+        <div class="form-row">
+          <label for="intensity">Training intensity</label>
+          <select id="intensity">
+            <option value="light">Light</option>
+            <option value="moderate" selected>Moderate</option>
+            <option value="hard">Hard</option>
+          </select>
         </div>
       </div>
 
       <div class="adjust-row">
         <div class="form-row adjust-input">
-          <label for="kcalAdj">Daily kcal adjustment</label>
-          <input id="kcalAdj" type="number" value="0">
+          <label>Daily kcal adjustment</label>
+          <div class="adjust-control">
+            <button class="adjust-btn" onclick="changeAdj(-100)">−</button>
+            <input id="kcalAdj" type="number" value="0">
+            <button class="adjust-btn" onclick="changeAdj(100)">+</button>
+          </div>
         </div>
         <div>
           <div style="font-size:11px; color:#9ca3af;">Negative = loss, positive = gain</div>
@@ -294,6 +341,7 @@
       <div class="chips-row">
         <div class="chip" id="chipRmr">RMR: –</div>
         <div class="chip" id="chipPal">PAL: –</div>
+        <div class="chip" id="chipTrain">Training: –</div>
         <div class="chip" id="chipTdee">TDEE: –</div>
         <div class="chip" id="chipRate">Δ weight: –</div>
       </div>
@@ -312,6 +360,7 @@
       <div class="calc-strip">
         <div class="pill" id="pillRmr">RMR –</div>
         <div class="pill" id="pillPal">× PAL –</div>
+        <div class="pill" id="pillTrain">+ Training –</div>
         <div class="pill" id="pillAdj">± 0 kcal</div>
         <div class="pill pill-strong" id="pillTdee">= – kcal</div>
       </div>
@@ -355,7 +404,6 @@
   </div>
 
   <script>
-    // --- Core calc ---
     function calcRmr(sex, weight, height, age) {
       if (sex === 'male') {
         return 10 * weight + 6.25 * height - 5 * age + 5;
@@ -364,7 +412,19 @@
       }
     }
 
-    // Macro state in % (must sum to 100)
+    function kcalPerHourForIntensity(intensity) {
+      if (intensity === 'light') return 250;
+      if (intensity === 'moderate') return 400;
+      return 550; // hard
+    }
+
+    function changeAdj(delta) {
+      const input = document.getElementById('kcalAdj');
+      const current = Number(input.value || 0);
+      input.value = current + delta;
+      recalc();
+    }
+
     let carbPct = 35;
     let protPct = 35;
     let fatPct  = 30;
@@ -375,25 +435,33 @@
       const weight = Number(document.getElementById('weight').value);
       const height = Number(document.getElementById('height').value);
       const pal = Number(document.getElementById('pal').value);
-      const trainingKcal = Number(document.getElementById('trainingKcal').value || 0);
+      const sessions = Number(document.getElementById('sessions').value || 0);
+      const duration = Number(document.getElementById('duration').value || 0);
+      const intensity = document.getElementById('intensity').value;
       const kcalAdj = Number(document.getElementById('kcalAdj').value || 0);
 
       const rmr = calcRmr(sex, weight, height, age);
       const base = rmr * pal;
-      const tdee = base + trainingKcal;
-      const target = tdee + kcalAdj;
 
+      const activeMinutes = duration * 0.6;
+      const kcalPerHour = kcalPerHourForIntensity(intensity);
+      const kcalPerSession = (activeMinutes / 60) * kcalPerHour;
+      const trainingKcalPerDay = (sessions * kcalPerSession) / 7;
+
+      const tdee = base + trainingKcalPerDay;
+      const target = tdee + kcalAdj;
       const weeklyKg = kcalAdj * 0.0009; // 100 kcal/day ≈ 0.09 kg/week
 
       document.getElementById('chipRmr').innerText = 'RMR: ' + Math.round(rmr) + ' kcal';
       document.getElementById('chipPal').innerText = 'PAL: ' + pal.toFixed(2);
+      document.getElementById('chipTrain').innerText = 'Training: ' + Math.round(trainingKcalPerDay) + ' kcal/day';
       document.getElementById('chipTdee').innerText = 'TDEE: ' + Math.round(tdee) + ' kcal';
-      document.getElementById('chipRate').innerText =
-        'Δ: ' + weeklyKg.toFixed(2) + ' kg/week';
+      document.getElementById('chipRate').innerText = 'Δ: ' + weeklyKg.toFixed(2) + ' kg/week';
 
       document.getElementById('targetKcal').innerText = Math.round(target);
       document.getElementById('pillRmr').innerText = 'RMR ' + Math.round(rmr);
       document.getElementById('pillPal').innerText = '× PAL ' + pal.toFixed(2);
+      document.getElementById('pillTrain').innerText = '+ Training ' + Math.round(trainingKcalPerDay);
       document.getElementById('pillAdj').innerText =
         (kcalAdj >= 0 ? '+ ' : '− ') + Math.abs(kcalAdj) + ' kcal';
       document.getElementById('pillTdee').innerText = '= ' + Math.round(target) + ' kcal';
@@ -406,7 +474,6 @@
       updateMacroLines(target, weight);
     }
 
-    // --- Macro slider implementation ---
     function updateMacroBar() {
       const track = document.getElementById('macroTrack');
       const width = track.clientWidth;
