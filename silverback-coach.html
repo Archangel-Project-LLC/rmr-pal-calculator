@@ -16,7 +16,7 @@
       max-width: 1100px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
+      grid-template-columns: 0.9fr 1.1fr; /* wider right column */
       gap: 24px;
     }
 
@@ -95,21 +95,6 @@
 
     button:hover {
       background: #0ea5e9;
-    }
-
-    .chips-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .chip {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid #1f2937;
-      font-size: 11px;
-      color: #9ca3af;
     }
 
     .calc-strip {
@@ -389,18 +374,11 @@
             100 kcal/day ≈ 0.09 kg/week.
           </div>
         </div>
-        <div class="adjust-dbw" id="adjustDbw">Estimated change: 0.00 kg/week (–)</div>
+        <div class="adjust-dbw" id="adjustDbw">Estimated change: 0.00 kg/week (maintain)</div>
       </div>
 
       <div class="button-row">
         <button onclick="recalc()">Update calculations</button>
-      </div>
-
-      <div class="chips-row">
-        <div class="chip" id="chipRmr">RMR: –</div>
-        <div class="chip" id="chipPal">PAL: –</div>
-        <div class="chip" id="chipTrain">Training: –</div>
-        <div class="chip" id="chipTdee">TDEE: –</div>
       </div>
     </div>
 
@@ -494,7 +472,7 @@
           </tbody>
         </table>
         <div class="timing-small">
-          Ranges combine fixed g/kg targets with % of daily carbs, using 0.4–0.55 g/kg for any meal, 0.6–0.8 g/kg post‑training and 0.5–1.5 g/kg for carbs depending on phase.[web:17]
+          Ranges combine fixed g/kg targets with % of daily carbs for any meal, post‑training and carb phases.[web:17]
         </div>
       </div>
     </div>
@@ -548,11 +526,6 @@
       const tdee = base + trainingKcalPerDay;
       const target = tdee + kcalAdj;
       const weeklyKg = kcalAdj * 0.0009; // 100 kcal/day ≈ 0.09 kg/week[web:17]
-
-      document.getElementById('chipRmr').innerText = 'RMR: ' + Math.round(rmr) + ' kcal';
-      document.getElementById('chipPal').innerText = 'PAL: ' + pal.toFixed(2);
-      document.getElementById('chipTrain').innerText = 'Training: ' + Math.round(trainingKcalPerDay) + ' kcal/day';
-      document.getElementById('chipTdee').innerText = 'TDEE: ' + Math.round(tdee) + ' kcal';
 
       document.getElementById('targetKcal').innerText = Math.round(target);
       document.getElementById('pillRmr').innerText = 'RMR ' + Math.round(rmr);
@@ -622,7 +595,6 @@
 
       const protKcal = totalKcal * (protPct / 100);
       const protG    = protKcal / 4;
-      const protGkg  = protG / w;
 
       // Protein
       const anyMin = 0.4 * w;
@@ -630,40 +602,32 @@
       const postMin = 0.6 * w;
       const postMax = 0.8 * w;
 
-      // Use "any meal" band as pre‑workout protein guide
       document.getElementById('tProtPreShort').innerText =
-        Math.round(anyMin) + '–' + Math.round(anyMax) +
-        ' g (0.40–0.55 g/kg)';
+        Math.round(anyMin) + '–' + Math.round(anyMax) + ' g (0.40–0.55 g/kg)';
 
       document.getElementById('tProtPreLong').innerText =
-        Math.round(anyMin) + '–' + Math.round(anyMax) +
-        ' g (0.40–0.55 g/kg)';
+        Math.round(anyMin) + '–' + Math.round(anyMax) + ' g (0.40–0.55 g/kg)';
 
       document.getElementById('tProtIntra').innerText =
         'Typically 0 g (optional small EAA/WH if needed)';
 
       document.getElementById('tProtPost').innerText =
-        Math.round(postMin) + '–' + Math.round(postMax) +
-        ' g (0.60–0.80 g/kg)';
+        Math.round(postMin) + '–' + Math.round(postMax) + ' g (0.60–0.80 g/kg)';
 
       // Helper for carb ranges
       function rangeFromGkg(valuesGkg, pctOfCarbs) {
         const grams = valuesGkg.map(v => v * w);
-        const minG = Math.round(Math.min(...grams));
-        const maxG = Math.round(Math.max(...grams));
+        let minG = Math.min(...grams);
+        let maxG = Math.max(...grams);
         let desc = valuesGkg.map(v => v.toFixed(2) + ' g/kg').join(', ');
         if (pctOfCarbs != null) {
           const pctG = carbG * (pctOfCarbs / 100);
           desc += ', ' + pctOfCarbs + '% ≈ ' + Math.round(pctG) + ' g';
-          const minAll = Math.min(minG, pctG);
-          const maxAll = Math.max(maxG, pctG);
-          return {
-            text: minAll.toFixed(0) + '–' + maxAll.toFixed(0) + ' g',
-            detail: desc
-          };
+          minG = Math.min(minG, pctG);
+          maxG = Math.max(maxG, pctG);
         }
         return {
-          text: minG + '–' + maxG + ' g',
+          text: Math.round(minG) + '–' + Math.round(maxG) + ' g',
           detail: desc
         };
       }
@@ -674,7 +638,7 @@
         preShort.text + '<br><span class="timing-small">' +
         preShort.detail + '</span>';
 
-      // Pre >2 h: 0.5–0.8 g/kg & 15% carbs (slightly lighter)
+      // Pre > 2 h: 0.5–0.8 g/kg & 15% carbs
       const preLong = rangeFromGkg([0.5, 0.8], 15);
       document.getElementById('tCarbPreLong').innerHTML =
         preLong.text + '<br><span class="timing-small">' +
