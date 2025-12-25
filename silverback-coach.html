@@ -187,10 +187,16 @@
       line-height: 1.4;
     }
 
-    .adjust-dbw {
-      font-size: 12px;
+    .adjust-dbw-label {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .adjust-dbw-value {
+      font-size: 13px;
       color: #e5e7eb;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .macro-bar {
@@ -374,7 +380,10 @@
             100 kcal/day ≈ 0.09 kg/week.
           </div>
         </div>
-        <div class="adjust-dbw" id="adjustDbw">Estimated change: 0.00 kg/week (maintain)</div>
+        <div>
+          <div class="adjust-dbw-label">Estimated change:</div>
+          <div class="adjust-dbw-value" id="adjustDbw">0.00 kg/week (maintain)</div>
+        </div>
       </div>
 
       <div class="button-row">
@@ -537,7 +546,7 @@
 
       const sign = kcalAdj === 0 ? 'maintain' : (kcalAdj < 0 ? 'loss' : 'gain');
       document.getElementById('adjustDbw').innerText =
-        'Estimated change: ' + weeklyKg.toFixed(2) + ' kg/week (' + sign + ')';
+        weeklyKg.toFixed(2) + ' kg/week (' + sign + ')';
 
       updateMacroBar();
       updateMacroLines(target, weight);
