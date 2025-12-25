@@ -1,455 +1,229 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Silverback Coach Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 24px;
+      padding: 16px;
+      background: #0b0c10;
+      color: #f5f5f5;
     }
-
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
     .layout {
-      max-width: 1100px;
-      margin: 0 auto;
       display: grid;
-      grid-template-columns: 0.9fr 1.1fr; /* wider right column */
-      gap: 24px;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 16px;
     }
-
-    .panel {
-      background: #020617;
-      border-radius: 16px;
-      padding: 18px 20px 22px;
-      border: 1px solid #1f2937;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    .card {
+      background: #151821;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
-
-    .panel-header {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
+    .card h2 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
     }
-
-    .subtle {
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 16px;
-    }
-
-    .form-grid {
+    .grid-2 {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px 14px;
+      gap: 8px 12px;
+      align-items: center;
     }
-
-    .form-row {
-      display: flex;
-      flex-direction: column;
-    }
-
     label {
-      font-size: 12px;
-      margin-bottom: 3px;
-      color: #cbd5f5;
+      font-size: 0.85rem;
+      opacity: 0.9;
     }
-
-    input,
-    select {
-      padding: 7px 9px;
-      border-radius: 8px;
-      border: 1px solid #4b5563;
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 13px;
-      height: 34px;
-      box-sizing: border-box;
+    input, select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      background: #0f1118;
+      color: #f5f5f5;
+      font-size: 0.9rem;
     }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px #38bdf8;
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
-
-    .button-row {
-      margin-top: 14px;
+    input[type="number"] {
+      -moz-appearance: textfield;
     }
-
-    button {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: none;
-      background: #38bdf8;
-      color: #020617;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      height: 34px;
-      box-sizing: border-box;
-    }
-
-    button:hover {
-      background: #0ea5e9;
-    }
-
-    .calc-strip {
+    .output-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-top: 12px;
-      gap: 10px;
-      flex-wrap: wrap;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
     }
-
-    .pill {
-      background: #020617;
-      border-radius: 999px;
-      padding: 8px 14px;
-      border: 1px solid #1f2937;
-      font-size: 12px;
-      min-width: 110px;
-      text-align: center;
-    }
-
-    .pill-strong {
-      background: #0369a1;
-      border-color: #0ea5e9;
-      color: #e5e7eb;
+    .output-row span.value {
       font-weight: 600;
     }
-
-    .big-kcal {
-      font-size: 30px;
-      font-weight: 700;
-      margin-top: 6px;
-    }
-
-    .big-kcal-label {
-      font-size: 12px;
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #9ca3af;
+      letter-spacing: 0.04em;
+      background: #243447;
+      color: #cdd9e5;
+      margin-left: 4px;
     }
-
-    .centered {
-      text-align: center;
-    }
-
-    .adjust-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 16px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-
-    .adjust-input {
-      max-width: 200px;
-    }
-
-    .adjust-control {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .adjust-btn {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #1f2937;
-      background: #020617;
-      color: #e5e7eb;
-      cursor: pointer;
-      font-size: 13px;
-      width: 30px;
-      text-align: center;
-      height: 34px;
-      box-sizing: border-box;
-    }
-
-    .adjust-btn:hover {
-      background: #111827;
-    }
-
-    .adjust-control input {
-      width: 80px;
-      text-align: center;
-    }
-
-    .adjust-summary {
-      font-size: 11px;
-      color: #9ca3af;
-      line-height: 1.4;
-    }
-
-    .adjust-dbw-label {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 2px;
-    }
-
-    .adjust-dbw-value {
-      font-size: 13px;
-      color: #e5e7eb;
-      font-weight: 600;
-    }
-
-    .macro-bar {
-      margin-top: 14px;
-      padding: 10px 10px 12px;
-      background: #020617;
-      border-radius: 999px;
-      border: 1px solid #1f2937;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .macro-bar-track {
-      position: relative;
-      height: 18px;
-      border-radius: 999px;
-      overflow: hidden;
-      display: flex;
-    }
-
-    .macro-segment {
-      height: 100%;
-    }
-
-    .macro-carbs {
-      background: #0284c7;
-    }
-
-    .macro-protein {
-      background: #0f172a;
-    }
-
-    .macro-fat {
-      background: #f97316;
-    }
-
-    .handle {
-      position: absolute;
-      top: 50%;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: #f9fafb;
-      border: 2px solid #e5e7eb;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-    }
-
-    .macro-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 11px;
-    }
-
-    .macro-col {
-      text-align: left;
-    }
-
-    .macro-name {
-      font-weight: 600;
-    }
-
-    .macro-line {
-      color: #9ca3af;
-    }
-
-    .note {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 6px;
-    }
-
-    /* Timing panel table style */
-    .timing-table {
+    table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 6px;
-      font-size: 11px;
+      margin-top: 8px;
+      font-size: 0.8rem;
     }
-
-    .timing-table th,
-    .timing-table td {
-      padding: 6px 8px;
-      border-bottom: 1px solid #1f2937;
-    }
-
-    .timing-table th {
+    th, td {
+      border-bottom: 1px solid #242938;
+      padding: 4px 6px;
       text-align: left;
+      white-space: nowrap;
+    }
+    th {
       font-weight: 600;
-      color: #cbd5f5;
-      font-size: 11px;
+      background: #1b1f2b;
     }
-
-    .timing-phase {
-      color: #e5e7eb;
-      font-weight: 500;
+    .notice {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 6px;
     }
-
-    .timing-small {
-      color: #9ca3af;
-      font-size: 10px;
+    .pill-toggle {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid #333;
+      overflow: hidden;
+      margin-bottom: 8px;
     }
-
-    .right-col {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    .pill-toggle button {
+      border: none;
+      background: transparent;
+      color: #cdd9e5;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .pill-toggle button.active {
+      background: #f0b90b;
+      color: #111;
+      font-weight: 600;
+    }
+    .muted {
+      opacity: 0.7;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
   </style>
 </head>
 <body>
+  <h1>Silverback Coach Calculator</h1>
+
   <div class="layout">
-    <!-- LEFT: INPUTS -->
-    <div class="panel">
-      <div class="panel-header">Client inputs</div>
-      <div class="subtle">Coach-facing setup for RMR, PAL, training and manual calorie adjustment.</div>
-
-      <div class="form-grid">
-        <div class="form-row">
-          <label for="sex">Gender</label>
-          <select id="sex">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+    <!-- LEFT COLUMN: CORE CALCULATOR (existing stuff) -->
+    <div>
+      <div class="card">
+        <h2>Client inputs</h2>
+        <div class="grid-2">
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
           </select>
-        </div>
-        <div class="form-row">
+
           <label for="age">Age (years)</label>
-          <input id="age" type="number" value="30">
-        </div>
-        <div class="form-row">
+          <input id="age" type="number" value="30" min="16" max="80" />
+
           <label for="weight">Weight (kg)</label>
-          <input id="weight" type="number" value="80">
-        </div>
-        <div class="form-row">
+          <input id="weight" type="number" value="80" step="0.1" />
+
           <label for="height">Height (cm)</label>
-          <input id="height" type="number" value="180">
-        </div>
+          <input id="height" type="number" value="180" />
 
-        <div class="form-row">
-          <label for="pal">PAL (activity factor)</label>
-          <select id="pal">
-            <option value="1.2">1.2 · Sedentary · &lt;5k steps/day</option>
-            <option value="1.35">1.35 · Low active · 5–7.9k steps/day</option>
-            <option value="1.5" selected>1.5 · Moderate · 8–9.9k steps/day</option>
-            <option value="1.7">1.7 · Very active · 10–14.9k steps/day</option>
-            <option value="1.9">1.9 · Ultra active · ≥15k steps/day</option>
-          </select>
-        </div>
+          <label for="pal">PAL</label>
+          <input id="pal" type="number" value="1.5" step="0.05" />
 
-        <div class="form-row">
-          <label for="sessions">Training sessions per week</label>
-          <input id="sessions" type="number" value="0">
-        </div>
+          <label for="sessions">Sessions / week</label>
+          <input id="sessions" type="number" value="3" min="0" max="14" />
 
-        <div class="form-row">
-          <label for="duration">Average session duration (min)</label>
-          <input id="duration" type="number" value="60">
-        </div>
+          <label for="sessionMin">Session length (min)</label>
+          <input id="sessionMin" type="number" value="60" min="20" max="180" />
 
-        <div class="form-row">
-          <label for="intensity">Training intensity</label>
+          <label for="intensity">Intensity</label>
           <select id="intensity">
             <option value="light">Light</option>
             <option value="moderate" selected>Moderate</option>
             <option value="hard">Hard</option>
           </select>
+
+          <label for="dailyAdj">Daily kcal adjustment</label>
+          <input id="dailyAdj" type="number" value="-300" step="50" />
         </div>
+        <p class="notice">All calories and macros update automatically as you edit inputs.</p>
       </div>
 
-      <div class="adjust-row">
-        <div class="form-row adjust-input">
-          <label>Daily kcal adjustment</label>
-          <div class="adjust-control">
-            <button class="adjust-btn" onclick="changeAdj(-100)">−</button>
-            <input id="kcalAdj" type="number" value="0">
-            <button class="adjust-btn" onclick="changeAdj(100)">+</button>
+      <div class="card">
+        <h2>Energy & macros</h2>
+        <div id="energyOutputs">
+          <div class="output-row">
+            <span>RMR</span>
+            <span class="value" id="rmr">-</span>
           </div>
-          <div class="adjust-summary">
-            Negative = loss, positive = gain.<br>
-            100 kcal/day ≈ 0.09 kg/week.
+          <div class="output-row">
+            <span>Training kcal / day</span>
+            <span class="value" id="trainKcal">-</span>
+          </div>
+          <div class="output-row">
+            <span>TDEE</span>
+            <span class="value" id="tdee">-</span>
+          </div>
+          <div class="output-row">
+            <span>Target kcal</span>
+            <span class="value" id="targetKcal">-</span>
+          </div>
+          <div class="output-row">
+            <span>Δ kg / week (approx)</span>
+            <span class="value" id="deltaKg">-</span>
           </div>
         </div>
-        <div>
-          <div class="adjust-dbw-label">Estimated change:</div>
-          <div class="adjust-dbw-value" id="adjustDbw">0.00 kg/week (maintain)</div>
+
+        <hr style="border-color:#242938;margin:8px 0;" />
+
+        <div id="macroOutputs">
+          <div class="output-row">
+            <span>Carbs (g)</span>
+            <span class="value" id="carbG">-</span>
+          </div>
+          <div class="output-row">
+            <span>Protein (g)</span>
+            <span class="value" id="protG">-</span>
+          </div>
+          <div class="output-row">
+            <span>Fat (g)</span>
+            <span class="value" id="fatG">-</span>
+          </div>
         </div>
+        <p class="muted">Macro split defaults to 35% carbs, 35% protein, 30% fat. Adjust in code if needed.[web:141]</p>
       </div>
 
-      <div class="button-row">
-        <button onclick="recalc()">Update calculations</button>
-      </div>
-    </div>
-
-    <!-- RIGHT: TARGETS + TIMING -->
-    <div class="right-col">
-      <!-- Silverback target panel -->
-      <div class="panel">
-        <div class="panel-header">Silverback target</div>
-        <div class="subtle">Target energy and macro breakdown for current setup.</div>
-
-        <div class="centered">
-          <div class="big-kcal" id="targetKcal">–</div>
-          <div class="big-kcal-label">Target kcal / day</div>
-        </div>
-
-        <div class="calc-strip">
-          <div class="pill" id="pillRmr">RMR –</div>
-          <div class="pill" id="pillPal">× PAL –</div>
-          <div class="pill" id="pillTrain">+ Training –</div>
-          <div class="pill" id="pillAdj">± 0 kcal</div>
-          <div class="pill pill-strong" id="pillTdee">= – kcal</div>
-        </div>
-
-        <div style="margin-top:16px; font-size:12px; font-weight:600;">Macro split</div>
-        <div class="note">Drag handles to adjust 35% carbs · 35% protein · 30% fat (must sum to 100%).</div>
-
-        <div class="macro-bar" id="macroBar">
-          <div class="macro-bar-track" id="macroTrack">
-            <div class="macro-segment macro-carbs" id="segCarbs"></div>
-            <div class="macro-segment macro-protein" id="segProtein"></div>
-            <div class="macro-segment macro-fat" id="segFat"></div>
-          </div>
-          <div class="handle" id="handleLeft"></div>
-          <div class="handle" id="handleRight"></div>
-        </div>
-
-        <div class="macro-labels">
-          <div class="macro-col">
-            <div class="macro-name">Carbs</div>
-            <div class="macro-line" id="carbLine">–</div>
-          </div>
-          <div class="macro-col">
-            <div class="macro-name">Protein</div>
-            <div class="macro-line" id="protLine">–</div>
-          </div>
-          <div class="macro-col">
-            <div class="macro-name">Fat</div>
-            <div class="macro-line" id="fatLine">–</div>
-          </div>
-        </div>
-
-        <div class="note">
-          Lines show % of kcal, grams/day and g/kg (based on current bodyweight).
-        </div>
-      </div>
-
-      <!-- Nutrient timing panel -->
-      <div class="panel">
-        <div class="panel-header">Peri‑workout nutrient timing</div>
-        <div class="subtle">Coach-facing guide based on current protein, carbs and bodyweight.</div>
-
-        <table class="timing-table">
+      <div class="card">
+        <h2>Peri‑workout guide</h2>
+        <table>
           <thead>
             <tr>
               <th>Phase</th>
@@ -457,283 +231,378 @@
               <th>Carbs</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td class="timing-phase">Pre 1–2 h</td>
-              <td id="tProtPreShort">–</td>
-              <td id="tCarbPreShort">–</td>
-            </tr>
-            <tr>
-              <td class="timing-phase">Pre &gt; 2 h</td>
-              <td id="tProtPreLong">–</td>
-              <td id="tCarbPreLong">–</td>
-            </tr>
-            <tr>
-              <td class="timing-phase">Intra</td>
-              <td id="tProtIntra">–</td>
-              <td id="tCarbIntra">–</td>
-            </tr>
-            <tr>
-              <td class="timing-phase">Post</td>
-              <td id="tProtPost">–</td>
-              <td id="tCarbPost">–</td>
-            </tr>
+          <tbody id="periTable">
+            <!-- Filled by JS -->
           </tbody>
         </table>
-        <div class="timing-small">
-          Ranges combine fixed g/kg targets with % of daily carbs for any meal, post‑training and carb phases.[web:17]
+        <p class="notice">Ranges use your client’s body weight and total carbs to stay within evidence‑based targets.[web:73][web:80]</p>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: NEW MEAL TIMING CARDS -->
+    <div>
+      <!-- Training Day Card -->
+      <div class="card">
+        <h2>Training day timing</h2>
+
+        <div class="grid-2">
+          <label for="tdWake">Wake time</label>
+          <input id="tdWake" type="time" value="07:00" />
+
+          <label for="tdBed">Bed time</label>
+          <input id="tdBed" type="time" value="23:00" />
+
+          <label for="tdTrain">Training start</label>
+          <input id="tdTrain" type="time" value="18:00" />
+
+          <label for="tdMeals">Meals per day</label>
+          <select id="tdMeals">
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+          </select>
         </div>
+
+        <p class="notice">
+          First feeding within 1 h of waking, last 2–3 h before bed, mostly 3–5 h gaps, ≥4 protein feedings to support muscle retention and growth.[web:90][web:110][web:112]
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Meal</th>
+              <th>Time</th>
+              <th>Tag</th>
+              <th>Protein (g)</th>
+              <th>Carbs (g)</th>
+              <th>Fat (g)</th>
+            </tr>
+          </thead>
+          <tbody id="tdMealBody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Rest Day Card -->
+      <div class="card">
+        <h2>Rest day timing</h2>
+
+        <div class="grid-2">
+          <label for="rdWake">Wake time</label>
+          <input id="rdWake" type="time" value="07:00" />
+
+          <label for="rdBed">Bed time</label>
+          <input id="rdBed" type="time" value="23:00" />
+
+          <label for="rdMeals">Meals per day</label>
+          <select id="rdMeals">
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+
+        <p class="notice">
+          Same spacing rules, same ≥4 protein feedings, just without pre/intra/post tags. Coach can mirror training‑day macros or use lower‑kcal rest‑day targets.[web:90][web:110][web:111]
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Meal</th>
+              <th>Time</th>
+              <th>Protein (g)</th>
+              <th>Carbs (g)</th>
+              <th>Fat (g)</th>
+            </tr>
+          </thead>
+          <tbody id="rdMealBody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
   <script>
-    function calcRmr(sex, weight, height, age) {
-      if (sex === 'male') {
-        return 10 * weight + 6.25 * height - 5 * age + 5;
+    // ---------- Helper functions ----------
+    function parseTimeToMinutes(t) {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    }
+    function minutesToTimeStr(mins) {
+      mins = (mins + 1440) % 1440;
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      return (h < 10 ? "0" + h : "" + h) + ":" + (m < 10 ? "0" + m : "" + m);
+    }
+
+    function getIntensityKcalPerHour(intensity) {
+      if (intensity === "light") return 250;
+      if (intensity === "hard") return 550;
+      return 400; // moderate
+    }
+
+    // ---------- Core calculator ----------
+    function recalcCore() {
+      const gender = document.getElementById("gender").value;
+      const age = parseFloat(document.getElementById("age").value) || 0;
+      const weight = parseFloat(document.getElementById("weight").value) || 0;
+      const height = parseFloat(document.getElementById("height").value) || 0;
+      const pal = parseFloat(document.getElementById("pal").value) || 1.3;
+      const sessions = parseFloat(document.getElementById("sessions").value) || 0;
+      const sessionMin = parseFloat(document.getElementById("sessionMin").value) || 0;
+      const intensity = document.getElementById("intensity").value;
+      const dailyAdj = parseFloat(document.getElementById("dailyAdj").value) || 0;
+
+      // RMR (Mifflin-St Jeor)
+      let rmr;
+      if (gender === "M") {
+        rmr = 10 * weight + 6.25 * height - 5 * age + 5;
       } else {
-        return 10 * weight + 6.25 * height - 5 * age - 161;
+        rmr = 10 * weight + 6.25 * height - 5 * age - 161;
       }
-    }
 
-    function kcalPerHourForIntensity(intensity) {
-      if (intensity === 'light') return 250;
-      if (intensity === 'moderate') return 400;
-      return 550; // hard
-    }
+      const kcalPerHour = getIntensityKcalPerHour(intensity);
+      const trainingKcalPerDay =
+        sessions * ((sessionMin * 0.6) / 60) * kcalPerHour / 7;
 
-    function changeAdj(delta) {
-      const input = document.getElementById('kcalAdj');
-      const current = Number(input.value || 0);
-      input.value = current + delta;
-      recalc();
-    }
+      const tdee = rmr * pal + trainingKcalPerDay;
+      const target = tdee + dailyAdj;
+      const deltaKgWeek = dailyAdj * 0.0009;
 
-    let carbPct = 35;
-    let protPct = 35;
-    let fatPct  = 30;
+      document.getElementById("rmr").textContent = Math.round(rmr);
+      document.getElementById("trainKcal").textContent = Math.round(trainingKcalPerDay);
+      document.getElementById("tdee").textContent = Math.round(tdee);
+      document.getElementById("targetKcal").textContent = Math.round(target);
+      document.getElementById("deltaKg").textContent = deltaKgWeek.toFixed(2);
 
-    function recalc() {
-      const sex = document.getElementById('sex').value;
-      const age = Number(document.getElementById('age').value);
-      const weight = Number(document.getElementById('weight').value);
-      const height = Number(document.getElementById('height').value);
-      const pal = Number(document.getElementById('pal').value);
-      const sessions = Number(document.getElementById('sessions').value || 0);
-      const duration = Number(document.getElementById('duration').value || 0);
-      const intensity = document.getElementById('intensity').value;
-      const kcalAdj = Number(document.getElementById('kcalAdj').value || 0);
-
-      const rmr = calcRmr(sex, weight, height, age);
-      const base = rmr * pal;
-
-      const activeMinutes = duration * 0.6;
-      const kcalPerHour = kcalPerHourForIntensity(intensity);
-      const kcalPerSession = (activeMinutes / 60) * kcalPerHour;
-      const trainingKcalPerDay = (sessions * kcalPerSession) / 7;
-
-      const tdee = base + trainingKcalPerDay;
-      const target = tdee + kcalAdj;
-      const weeklyKg = kcalAdj * 0.0009; // 100 kcal/day ≈ 0.09 kg/week[web:17]
-
-      document.getElementById('targetKcal').innerText = Math.round(target);
-      document.getElementById('pillRmr').innerText = 'RMR ' + Math.round(rmr);
-      document.getElementById('pillPal').innerText = '× PAL ' + pal.toFixed(2);
-      document.getElementById('pillTrain').innerText = '+ Training ' + Math.round(trainingKcalPerDay);
-      document.getElementById('pillAdj').innerText =
-        (kcalAdj >= 0 ? '+ ' : '− ') + Math.abs(kcalAdj) + ' kcal';
-      document.getElementById('pillTdee').innerText = '= ' + Math.round(target) + ' kcal';
-
-      const sign = kcalAdj === 0 ? 'maintain' : (kcalAdj < 0 ? 'loss' : 'gain');
-      document.getElementById('adjustDbw').innerText =
-        weeklyKg.toFixed(2) + ' kg/week (' + sign + ')';
-
-      updateMacroBar();
-      updateMacroLines(target, weight);
-      updatePeriWorkoutTiming(target, weight);
-    }
-
-    function updateMacroBar() {
-      const track = document.getElementById('macroTrack');
-      const width = track.clientWidth;
-
-      const carbW = width * (carbPct / 100);
-      const protW = width * (protPct / 100);
-      const fatW  = width * (fatPct  / 100);
-
-      document.getElementById('segCarbs').style.width = carbW + 'px';
-      document.getElementById('segProtein').style.width = protW + 'px';
-      document.getElementById('segFat').style.width = fatW + 'px';
-
-      document.getElementById('handleLeft').style.left = (carbW) + 'px';
-      document.getElementById('handleRight').style.left = (carbW + protW) + 'px';
-    }
-
-    function updateMacroLines(targetKcal, weight) {
-      const totalKcal = Math.max(targetKcal, 1);
-
-      const carbKcal = totalKcal * (carbPct / 100);
-      const protKcal = totalKcal * (protPct / 100);
-      const fatKcal  = totalKcal * (fatPct  / 100);
+      // Macro split: 35/35/30
+      const carbKcal = target * 0.35;
+      const protKcal = target * 0.35;
+      const fatKcal = target * 0.30;
 
       const carbG = carbKcal / 4;
       const protG = protKcal / 4;
-      const fatG  = fatKcal  / 9;
+      const fatG = fatKcal / 9;
 
-      const w = Math.max(weight, 1);
+      document.getElementById("carbG").textContent = Math.round(carbG);
+      document.getElementById("protG").textContent = Math.round(protG);
+      document.getElementById("fatG").textContent = Math.round(fatG);
 
-      document.getElementById('carbLine').innerText =
-        carbPct.toFixed(0) + '% · ' + Math.round(carbG) + ' g (' +
-        (carbG / w).toFixed(2) + ' g/kg)';
-
-      document.getElementById('protLine').innerText =
-        protPct.toFixed(0) + '% · ' + Math.round(protG) + ' g (' +
-        (protG / w).toFixed(2) + ' g/kg)';
-
-      document.getElementById('fatLine').innerText =
-        fatPct.toFixed(0) + '% · ' + Math.round(fatG) + ' g (' +
-        (fatG / w).toFixed(2) + ' g/kg)';
+      recalcPeri(weight, carbG);
+      recalcTrainingDayMeals(weight, protG, carbG, fatG);
+      recalcRestDayMeals(weight, protG, carbG, fatG);
     }
 
-    function updatePeriWorkoutTiming(targetKcal, weight) {
-      const totalKcal = Math.max(targetKcal, 1);
-      const w = Math.max(weight, 1);
+    // ---------- Peri-workout table ----------
+    function recalcPeri(weight, dailyCarbG) {
+      const tbody = document.getElementById("periTable");
+      tbody.innerHTML = "";
 
-      const carbKcal = totalKcal * (carbPct / 100);
-      const carbG   = carbKcal / 4;
-
-      const protKcal = totalKcal * (protPct / 100);
-      const protG    = protKcal / 4;
-
-      // Protein
-      const anyMin = 0.4 * w;
-      const anyMax = 0.55 * w;
-      const postMin = 0.6 * w;
-      const postMax = 0.8 * w;
-
-      document.getElementById('tProtPreShort').innerText =
-        Math.round(anyMin) + '–' + Math.round(anyMax) + ' g (0.40–0.55 g/kg)';
-
-      document.getElementById('tProtPreLong').innerText =
-        Math.round(anyMin) + '–' + Math.round(anyMax) + ' g (0.40–0.55 g/kg)';
-
-      document.getElementById('tProtIntra').innerText =
-        'Typically 0 g (optional small EAA/WH if needed)';
-
-      document.getElementById('tProtPost').innerText =
-        Math.round(postMin) + '–' + Math.round(postMax) + ' g (0.60–0.80 g/kg)';
-
-      // Helper for carb ranges
-      function rangeFromGkg(valuesGkg, pctOfCarbs) {
-        const grams = valuesGkg.map(v => v * w);
-        let minG = Math.min(...grams);
-        let maxG = Math.max(...grams);
-        let desc = valuesGkg.map(v => v.toFixed(2) + ' g/kg').join(', ');
-        if (pctOfCarbs != null) {
-          const pctG = carbG * (pctOfCarbs / 100);
-          desc += ', ' + pctOfCarbs + '% ≈ ' + Math.round(pctG) + ' g';
-          minG = Math.min(minG, pctG);
-          maxG = Math.max(maxG, pctG);
-        }
-        return {
-          text: Math.round(minG) + '–' + Math.round(maxG) + ' g',
-          detail: desc
-        };
+      // Helper to add rows
+      function addRow(phase, pText, cText) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${phase}</td>
+          <td>${pText}</td>
+          <td>${cText}</td>
+        `;
+        tbody.appendChild(tr);
       }
 
-      // Pre 1–2 h: 0.8–1.0 g/kg & 15% carbs
-      const preShort = rangeFromGkg([0.8, 1.0], 15);
-      document.getElementById('tCarbPreShort').innerHTML =
-        preShort.text + '<br><span class="timing-small">' +
-        preShort.detail + '</span>';
+      // Pre 1–2 h: 0.4–0.55 g/kg protein, 0.8–1.0 g/kg OR ~15% of carbs
+      const preProtLow = Math.round(0.4 * weight);
+      const preProtHigh = Math.round(0.55 * weight);
+      const preCarbLow = Math.round(Math.min(0.8 * weight, 0.15 * dailyCarbG));
+      const preCarbHigh = Math.round(Math.max(1.0 * weight, 0.15 * dailyCarbG));
+      addRow(
+        "Pre 1–2 h",
+        `${preProtLow}–${preProtHigh} g`,
+        `${preCarbLow}–${preCarbHigh} g`
+      );
 
-      // Pre > 2 h: 0.5–0.8 g/kg & 15% carbs
-      const preLong = rangeFromGkg([0.5, 0.8], 15);
-      document.getElementById('tCarbPreLong').innerHTML =
-        preLong.text + '<br><span class="timing-small">' +
-        preLong.detail + '</span>';
+      // Pre >2 h: 0.4–0.55 g/kg protein, 0.5–0.8 g/kg OR ~15% carbs
+      const pre2CarbLow = Math.round(Math.min(0.5 * weight, 0.15 * dailyCarbG));
+      const pre2CarbHigh = Math.round(Math.max(0.8 * weight, 0.15 * dailyCarbG));
+      addRow(
+        "Pre >2 h",
+        `${preProtLow}–${preProtHigh} g`,
+        `${pre2CarbLow}–${pre2CarbHigh} g`
+      );
 
-      // Intra: 0.5 g/kg vs 60 g/h
-      const intraGkg = 0.5 * w;
-      const intraMin = Math.min(intraGkg, 60);
-      const intraMax = Math.max(intraGkg, 60);
-      document.getElementById('tCarbIntra').innerHTML =
-        Math.round(intraMin) + '–' + Math.round(intraMax) +
-        ' g<br><span class="timing-small">0.50 g/kg and/or ~60 g per training hour</span>';
+      // Intra: typically 0 g protein, 0.5 g/kg or 60 g
+      const intraCarbLow = Math.round(Math.min(0.5 * weight, 60));
+      const intraCarbHigh = Math.round(Math.max(0.5 * weight, 60));
+      addRow("Intra", `Typically 0 g`, `${intraCarbLow}–${intraCarbHigh} g`);
 
-      // Post: 0.6, 0.8, 1.2, 1.5 g/kg & 30% carbs
-      const post = rangeFromGkg([0.6, 0.8, 1.2, 1.5], 30);
-      document.getElementById('tCarbPost').innerHTML =
-        post.text + '<br><span class="timing-small">' +
-        post.detail + '</span>';
+      // Post: 0.6–0.8 g/kg protein, carbs from 0.6–1.5 g/kg or 30% carbs
+      const postProtLow = Math.round(0.6 * weight);
+      const postProtHigh = Math.round(0.8 * weight);
+      const postCarbLow = Math.round(
+        Math.min(0.6 * weight, 0.8 * weight, 1.2 * weight, 1.5 * weight, 0.3 * dailyCarbG)
+      );
+      const postCarbHigh = Math.round(
+        Math.max(0.6 * weight, 0.8 * weight, 1.2 * weight, 1.5 * weight, 0.3 * dailyCarbG)
+      );
+      addRow(
+        "Post (≤1 h)",
+        `${postProtLow}–${postProtHigh} g`,
+        `${postCarbLow}–${postCarbHigh} g`
+      );
     }
 
-    function initHandles() {
-      const track = document.getElementById('macroTrack');
-      const handleLeft = document.getElementById('handleLeft');
-      const handleRight = document.getElementById('handleRight');
-
-      let dragging = null;
-
-      function onMouseDown(e, which) {
-        dragging = which;
-        e.preventDefault();
-      }
-
-      function onMouseMove(e) {
-        if (!dragging) return;
-        const rect = track.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        if (x < 0) x = 0;
-        if (x > rect.width) x = rect.width;
-
-        const totalWidth = rect.width;
-
-        if (dragging === 'left') {
-          const rightPos = (carbPct + protPct) / 100 * totalWidth;
-          if (x < 0) x = 0;
-          if (x > rightPos - 20) x = rightPos - 20;
-          const newCarbPct = (x / totalWidth) * 100;
-          const totalCP = carbPct + protPct;
-          const newProtPct = totalCP - newCarbPct;
-          carbPct = Math.max(5, Math.min(90, newCarbPct));
-          protPct = Math.max(5, Math.min(90, newProtPct));
-        } else if (dragging === 'right') {
-          const leftPos = (carbPct / 100) * totalWidth;
-          if (x < leftPos + 20) x = leftPos + 20;
-          if (x > totalWidth) x = totalWidth;
-          const cpWidth = x - leftPos;
-          const newProtPct = (cpWidth / totalWidth) * 100;
-          const newFatPct = 100 - carbPct - newProtPct;
-          protPct = Math.max(5, Math.min(90, newProtPct));
-          fatPct = Math.max(5, Math.min(90, newFatPct));
+    // ---------- Meal timing logic (shared helpers) ----------
+    function buildMealTimes(wakeStr, bedStr, meals) {
+      const wake = parseTimeToMinutes(wakeStr);
+      const bed = parseTimeToMinutes(bedStr);
+      let awakeSpan = bed - wake;
+      if (awakeSpan <= 0) awakeSpan += 1440; // handle wrap
+      const firstMeal = wake + 30; // target ~30 min after waking
+      const lastMeal = bed - 150; // 2.5 h before bed
+      if (lastMeal <= firstMeal) {
+        // fallback: pack meals between wake and bed
+        const gap = awakeSpan / (meals - 1);
+        const times = [];
+        for (let i = 0; i < meals; i++) {
+          times.push(wake + i * gap);
         }
-
-        const sum = carbPct + protPct + fatPct;
-        if (sum !== 100) {
-          const factor = 100 / sum;
-          carbPct *= factor;
-          protPct *= factor;
-          fatPct  *= factor;
-        }
-
-        recalc();
+        return times;
       }
-
-      function onMouseUp() {
-        dragging = null;
+      const span = lastMeal - firstMeal;
+      const gap = span / (meals - 1);
+      const times = [];
+      for (let i = 0; i < meals; i++) {
+        times.push(firstMeal + i * gap);
       }
-
-      handleLeft.addEventListener('mousedown', e => onMouseDown(e, 'left'));
-      handleRight.addEventListener('mousedown', e => onMouseDown(e, 'right'));
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+      return times;
     }
 
-    window.addEventListener('load', () => {
-      initHandles();
-      recalc();
-    });
+    function distributeMacrosOverMeals(meals, protG, carbG, fatG) {
+      // Even distribution as a baseline; coaches can tweak after
+      const perProt = protG / meals;
+      const perCarb = carbG / meals;
+      const perFat = fatG / meals;
+      const arr = [];
+      for (let i = 0; i < meals; i++) {
+        arr.push({
+          protein: perProt,
+          carbs: perCarb,
+          fat: perFat
+        });
+      }
+      return arr;
+    }
+
+    function tagTrainingMeals(mealTimes, trainStr) {
+      const trainMin = parseTimeToMinutes(trainStr);
+      const tags = new Array(mealTimes.length).fill("");
+      // Find pre: last meal before training
+      let preIdx = -1;
+      for (let i = 0; i < mealTimes.length; i++) {
+        if (mealTimes[i] < trainMin) preIdx = i;
+      }
+      if (preIdx === -1) preIdx = 0; // if training very early, breakfast becomes pre
+
+      // Find post: first meal after training
+      let postIdx = -1;
+      for (let i = 0; i < mealTimes.length; i++) {
+        if (mealTimes[i] > trainMin) {
+          postIdx = i;
+          break;
+        }
+      }
+      if (postIdx === -1) postIdx = mealTimes.length - 1; // late training, last meal is post
+
+      tags[preIdx] = "Pre";
+      tags[postIdx] = "Post";
+      // Intra is at training time (shown in peri card, here just label on pre/post context if wanted)
+      return tags;
+    }
+
+    // ---------- Training day card ----------
+    function recalcTrainingDayMeals(weight, protG, carbG, fatG) {
+      const wakeStr = document.getElementById("tdWake").value;
+      const bedStr = document.getElementById("tdBed").value;
+      const trainStr = document.getElementById("tdTrain").value;
+      const meals = parseInt(document.getElementById("tdMeals").value, 10) || 4;
+
+      const times = buildMealTimes(wakeStr, bedStr, meals);
+      const macros = distributeMacrosOverMeals(meals, protG, carbG, fatG);
+      const tags = tagTrainingMeals(times, trainStr);
+
+      const tbody = document.getElementById("tdMealBody");
+      tbody.innerHTML = "";
+
+      times.forEach((t, idx) => {
+        const tr = document.createElement("tr");
+        const tag = tags[idx];
+        const label = `Meal ${idx + 1}`;
+        const timeStr = minutesToTimeStr(t);
+        const p = Math.round(macros[idx].protein);
+        const c = Math.round(macros[idx].carbs);
+        const f = Math.round(macros[idx].fat);
+
+        tr.innerHTML = `
+          <td>${label}</td>
+          <td>${timeStr}</td>
+          <td>${tag ? `<span class="tag">${tag}</span>` : ""}</td>
+          <td>${p}</td>
+          <td>${c}</td>
+          <td>${f}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------- Rest day card ----------
+    function recalcRestDayMeals(weight, protG, carbG, fatG) {
+      const wakeStr = document.getElementById("rdWake").value;
+      const bedStr = document.getElementById("rdBed").value;
+      const meals = parseInt(document.getElementById("rdMeals").value, 10) || 4;
+
+      const times = buildMealTimes(wakeStr, bedStr, meals);
+      const macros = distributeMacrosOverMeals(meals, protG, carbG, fatG);
+
+      const tbody = document.getElementById("rdMealBody");
+      tbody.innerHTML = "";
+
+      times.forEach((t, idx) => {
+        const tr = document.createElement("tr");
+        const label = `Meal ${idx + 1}`;
+        const timeStr = minutesToTimeStr(t);
+        const p = Math.round(macros[idx].protein);
+        const c = Math.round(macros[idx].carbs);
+        const f = Math.round(macros[idx].fat);
+
+        tr.innerHTML = `
+          <td>${label}</td>
+          <td>${timeStr}</td>
+          <td>${p}</td>
+          <td>${c}</td>
+          <td>${f}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------- Event wiring ----------
+    function wireInputs() {
+      const ids = [
+        "gender","age","weight","height","pal","sessions",
+        "sessionMin","intensity","dailyAdj",
+        "tdWake","tdBed","tdTrain","tdMeals",
+        "rdWake","rdBed","rdMeals"
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", recalcCore);
+        el.addEventListener("change", recalcCore);
+      });
+    }
+
+    wireInputs();
+    recalcCore();
   </script>
 </body>
 </html>
