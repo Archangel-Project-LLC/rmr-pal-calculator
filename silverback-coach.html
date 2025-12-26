@@ -306,7 +306,6 @@
       gap: 18px;
     }
 
-    /* NEW: planner tables */
     .planner-wrapper {
       max-width: 1100px;
       margin: 18px auto 0;
@@ -507,7 +506,7 @@
 
       <div class="panel">
         <div class="panel-header">Peri‑workout nutrient timing</div>
-        <div class="subtle">Coach-facing guide based on current protein, carbs and bodyweight.</div>
+        <div class="subtle">Coach-facing guide based on current bodyweight only (fixed g/kg bands).[web:69][web:225]</div>
 
         <table class="timing-table">
           <thead>
@@ -541,15 +540,14 @@
           </tbody>
         </table>
         <div class="timing-small">
-          Ranges combine fixed g/kg targets with % of daily carbs for any meal, post‑training and carb phases.[web:73]
+          Protein ranges ~0.4–0.55 g/kg for pre meals, 0.6–0.8 g/kg post; carbs use 0.8–1.0 g/kg pre, 0.5–0.8 g/kg longer pre, 0.6–1.5 g/kg post, and ~0.5 g/kg or 30–60 g/h intra.[web:69][web:216][web:219]
         </div>
       </div>
     </div>
   </div>
 
-  <!-- NEW: full‑width planner panels -->
+  <!-- Planner panels -->
   <div class="planner-wrapper">
-    <!-- Training day -->
     <div class="panel">
       <div class="panel-header">Training day meal timing</div>
       <div class="subtle">
@@ -593,14 +591,13 @@
         <tfoot>
           <tr>
             <td colspan="6" class="timing-small">
-              Intra training: typically 0 g protein, ~0.5 g/kg carbs and/or ~30–60 g per training hour, aligned with your peri‑workout card.[web:193][web:202]
+              Intra training: typically 0 g protein, ~0.5 g/kg carbs and/or ~30–60 g per training hour, matching the peri‑workout card.[web:193][web:202]
             </td>
           </tr>
         </tfoot>
       </table>
     </div>
 
-    <!-- Rest day -->
     <div class="panel">
       <div class="panel-header">Rest day meal timing</div>
       <div class="subtle">
@@ -707,7 +704,7 @@
 
       updateMacroBar();
       updateMacroLines(target, weight);
-      updatePeriWorkoutTiming(target, weight);
+      updatePeriWorkoutTiming(weight);
       recalcTrainingDayMeals(weight, target);
       recalcRestDayMeals(weight, target);
     }
@@ -754,16 +751,11 @@
         (fatG / w).toFixed(2) + ' g/kg)';
     }
 
-    function updatePeriWorkoutTiming(targetKcal, weight) {
-      const totalKcal = Math.max(targetKcal, 1);
+    // NEW: fixed‑band peri‑workout, only weight‑based
+    function updatePeriWorkoutTiming(weight) {
       const w = Math.max(weight, 1);
 
-      const carbKcal = totalKcal * (carbPct / 100);
-      const carbG   = carbKcal / 4;
-
-      const protKcal = totalKcal * (protPct / 100);
-      const protG    = protKcal / 4;
-
+      // Protein bands
       const anyMin = 0.4 * w;
       const anyMax = 0.55 * w;
       const postMin = 0.6 * w;
@@ -781,47 +773,33 @@
       document.getElementById('tProtPost').innerText =
         Math.round(postMin) + '–' + Math.round(postMax) + ' g (0.60–0.80 g/kg)';
 
-      function rangeFromGkg(valuesGkg, pctOfCarbs) {
-        const grams = valuesGkg.map(v => v * w);
-        let minG = Math.min(...grams);
-        let maxG = Math.max(...grams);
-        let desc = valuesGkg.map(v => v.toFixed(2) + ' g/kg').join(', ');
-        if (pctOfCarbs != null) {
-          const pctG = carbG * (pctOfCarbs / 100);
-          desc += ', ' + pctOfCarbs + '% ≈ ' + Math.round(pctG) + ' g';
-          minG = Math.min(minG, pctG);
-          maxG = Math.max(maxG, pctG);
-        }
-        return {
-          text: Math.round(minG) + '–' + Math.round(maxG) + ' g',
-          detail: desc
-        };
-      }
-
-      const preShort = rangeFromGkg([0.8, 1.0], 15);
+      // Carb bands – all fixed g/kg
+      const preShortMin = 0.8 * w;
+      const preShortMax = 1.0 * w;
       document.getElementById('tCarbPreShort').innerHTML =
-        preShort.text + '<br><span class="timing-small">' +
-        preShort.detail + '</span>';
+        Math.round(preShortMin) + '–' + Math.round(preShortMax) +
+        ' g<br><span class="timing-small">0.80–1.00 g/kg</span>';
 
-      const preLong = rangeFromGkg([0.5, 0.8], 15);
+      const preLongMin = 0.5 * w;
+      const preLongMax = 0.8 * w;
       document.getElementById('tCarbPreLong').innerHTML =
-        preLong.text + '<br><span class="timing-small">' +
-        preLong.detail + '</span>';
+        Math.round(preLongMin) + '–' + Math.round(preLongMax) +
+        ' g<br><span class="timing-small">0.50–0.80 g/kg</span>';
 
-      const intraGkg = 0.5 * w;
-      const intraMin = Math.min(intraGkg, 60);
-      const intraMax = Math.max(intraGkg, 60);
+      const intraMin = Math.min(0.5 * w, 30);
+      const intraMax = Math.max(0.5 * w, 60);
       document.getElementById('tCarbIntra').innerHTML =
         Math.round(intraMin) + '–' + Math.round(intraMax) +
-        ' g<br><span class="timing-small">0.50 g/kg and/or ~60 g per training hour</span>';
+        ' g<br><span class="timing-small">~0.50 g/kg and/or ~30–60 g per training hour</span>';
 
-      const post = rangeFromGkg([0.6, 0.8, 1.2, 1.5], 30);
+      const postMinG = 0.6 * w;
+      const postMaxG = 1.5 * w;
       document.getElementById('tCarbPost').innerHTML =
-        post.text + '<br><span class="timing-small">' +
-        post.detail + '</span>';
+        Math.round(postMinG) + '–' + Math.round(postMaxG) +
+        ' g<br><span class="timing-small">0.60–1.50 g/kg</span>';
     }
 
-    // ---------- Planner helpers ----------
+    // Planner helpers
     function parseTimeToMinutes(t) {
       const [h, m] = t.split(':').map(Number);
       return h * 60 + m;
